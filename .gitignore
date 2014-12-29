@@ -1,0 +1,9 @@
+*.exe
+*.pdb
+*.opensdf
+*.sdf
+*.suo
+/source/vs2013/x64
+/source/vs2013/Debug
+/source/vs2013/Release
+*.ilk
