@@ -1951,7 +1951,10 @@ BOOL initialize_lpt_driver()
 
 		if (IsInpOutDriverOpen())
 		{
-			printf("I/O access driver InpOut32 (%s) loaded succesfully.\n", IsXP64Bit() ? "64-bit" : "32-bit");
+			if (verbose)
+			{
+				printf("I/O access driver InpOut32 (%s) loaded succesfully.\n", IsXP64Bit() ? "64-bit" : "32-bit");
+			}
 		}
 		else
 		{
