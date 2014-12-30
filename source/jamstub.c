@@ -1219,7 +1219,12 @@ int main(int argc, char **argv)
 			*	Get Operating System type
 			*/
 #if PORT == WINDOWS || PORT == WINDOWS_INPOUT32
+#if _MSC_VER >= 1500
+			// this Visual C++ compiler has no support for 95, 98, Me and NT anymore
+			windows_nt = TRUE;
+#else
 			windows_nt = !(GetVersion() & 0x80000000);
+#endif
 #endif
 
 			/*
