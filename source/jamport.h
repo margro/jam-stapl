@@ -34,9 +34,11 @@
 #define UNIX     4
 #define EMBEDDED 5
 #define WINDOWS_INPOUT32 6
+#define LINUX_RPI 7
 
 /* change this line to build a different port */
-//#define PORT WINDOWS
+#ifndef PORT
 #define PORT WINDOWS_INPOUT32
+#endif /* PORT */
 
 #endif /* INC_JAMPORT_H */

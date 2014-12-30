@@ -41,6 +41,7 @@
 
 #if PORT == WINDOWS || PORT == WINDOWS_INPOUT32
 #include <windows.h>
+#include <io.h>
 #else
 typedef int BOOL;
 typedef unsigned char BYTE;
@@ -53,9 +54,7 @@ typedef unsigned long DWORD;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <io.h>
 #include <fcntl.h>
-#include <process.h>
 #if defined(USE_STATIC_MEMORY)
 	#define N_STATIC_MEMORY_KBYTES ((unsigned int) USE_STATIC_MEMORY)
 	#define N_STATIC_MEMORY_BYTES (N_STATIC_MEMORY_KBYTES * 1024)
@@ -65,7 +64,6 @@ typedef unsigned long DWORD;
 	#define POINTER_ALIGNMENT sizeof(BYTE)
 #endif /* USE_STATIC_MEMORY */
 #include <time.h>
-#include <conio.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -80,7 +78,15 @@ typedef unsigned long DWORD;
 #endif
 
 #if PORT == DOS
+#include <io.h>
+#include <process.h>
+#include <conio.h>
 #include <bios.h>
+#endif
+
+#if PORT == LINUX_RPI
+#include <unistd.h>
+#include "jamgpio.h"
 #endif
 
 #include "jamexprt.h"
@@ -303,7 +309,6 @@ int jam_seek(long offset)
 
 int jam_jtag_io(int tms, int tdi, int read_tdo)
 {
-	int data = 0;
 	int tdo = 0;
 	int i = 0;
 	int result = 0;
@@ -348,7 +353,7 @@ int jam_jtag_io(int tms, int tdi, int read_tdo)
 	else
 	{
 #if PORT == WINDOWS || PORT == WINDOWS_INPOUT32 || PORT == DOS
-		data = (alternative_cable_l ? ((tdi ? 0x01 : 0) | (tms ? 0x04 : 0)) :
+		int data = (alternative_cable_l ? ((tdi ? 0x01 : 0) | (tms ? 0x04 : 0)) :
 		       (alternative_cable_x ? ((tdi ? 0x01 : 0) | (tms ? 0x04 : 0) | 0x10) :
 		       ((tdi ? 0x40 : 0) | (tms ? 0x02 : 0))));
 
@@ -365,6 +370,27 @@ int jam_jtag_io(int tms, int tdi, int read_tdo)
 		write_byteblaster(0, data | (alternative_cable_l ? 0x02 : (alternative_cable_x ? 0x02: 0x01)));
 
 		write_byteblaster(0, data);
+#elif PORT == LINUX_RPI
+		// set TDI and TMS to correct value
+		if(tdi)
+			gpio_set_tdi();
+		else
+			gpio_clear_tdi();
+
+		if(tms)
+			gpio_set_tms();
+		else
+			gpio_clear_tms();
+
+		if (read_tdo)
+		{
+			// Read TDO
+			tdo = gpio_get_tdo();
+		}
+
+		// Pulse TCK
+		gpio_set_tck();
+		gpio_clear_tck();
 #else
 		/* parallel port interface not available */
 		tdo = 0;
@@ -551,6 +577,11 @@ int jam_vector_io
 	long *capture_vect
 )
 {
+#if PORT == LINUX_RPI
+	printf("BUG : vector IO called\n");
+	exit(-1);
+#endif
+
 	int signal, vector, bit;
 	int matched_count = 0;
 	int data = 0;
@@ -900,7 +931,7 @@ void calibrate_delay(void)
 
 	one_ms_delay = 0L;
 
-#if PORT == WINDOWS || PORT == WINDOWS_INPOUT32 || PORT == DOS
+#if PORT == WINDOWS || PORT == WINDOWS_INPOUT32 || PORT == DOS || PORT == LINUX_RPI
 	for (sample = 0; sample < DELAY_SAMPLES; ++sample)
 	{
 		count = 0;
@@ -1362,7 +1393,7 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				printf("Unknown error code %ld\n", exec_result);
+				printf("Unknown error code %d\n", exec_result);
 			}
 
 			/*
@@ -1814,7 +1845,13 @@ void initialize_jtag_hardware()
 		/* set AUTO-FEED low to enable ByteBlaster (value to port inverted) */
 		/* set DIRECTION low for data output from parallel port */
 		write_byteblaster(2, (initial_lpt_ctrl | 0x02) & 0xDF);
-#endif
+#endif /* WINDOWS, WINDOWS_INPOUT32, DOS */
+
+#if PORT == LINUX_RPI
+		printf("[RPi] Initialize GPIO hardware\n");
+		gpio_init();
+		gpio_init_jtag();
+#endif /* LINUX_RPI */
 	}
 }
 
@@ -1829,6 +1866,7 @@ void close_jtag_hardware()
 #if PORT == WINDOWS || PORT == WINDOWS_INPOUT32 || PORT == DOS
 		/* set AUTO-FEED high to disable ByteBlaster */
 		write_byteblaster(2, initial_lpt_ctrl & 0xfd);
+#endif
 
 #if PORT == WINDOWS
 		if (windows_nt && (nt_device_handle != INVALID_HANDLE_VALUE))
@@ -1841,7 +1879,9 @@ void close_jtag_hardware()
 		write_byteblaster(0, 0x00);
 		FreeLibrary(hInpOutDll);
 		hInpOutDll = NULL;
-#endif
+#elif PORT == LINUX_RPI
+		gpio_close_jtag();
+		gpio_exit();
 #endif
 	}
 }
@@ -2137,7 +2177,9 @@ void flush_ports(void)
 #endif /* PORT == WINDOWS || PORT == DOS */
 
 #if !defined (DEBUG)
+#ifdef _MSC_VER
 #pragma optimize ("ceglt", off)
+#endif
 #endif
 
 void delay_loop(long count)

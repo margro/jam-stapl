@@ -6,36 +6,37 @@
 #	Description:	Makefile for JAM Interpreter
 #
 
-OBJS = \
-	jamstub.obj \
-	jamexec.obj \
-	jamnote.obj \
-	jamcrc.obj \
-	jamsym.obj \
-	jamstack.obj \
-	jamheap.obj \
-	jamarray.obj \
-	jamcomp.obj \
-	jamjtag.obj \
-	jamutil.obj \
-	jamexp.obj
+CC = gcc
+CFLAGS = -c -Wall -DPORT=LINUX_RPI
+EXE = jam
 
-.c.obj :
-	cl /W4 /c /O2 /ML /DWINNT $<
+OBJS =  jamstub.o \
+	jamexec.o \
+	jamnote.o \
+	jamcrc.o \
+	jamsym.o \
+	jamstack.o \
+	jamheap.o \
+	jamarray.o \
+	jamcomp.o \
+	jamjtag.o \
+	jamutil.o \
+	jamexp.o \
+	jamgpio.o
 
-# LINK: add appropriate linker command here
-
-jam.exe : $(OBJS)
-	link $(OBJS) advapi32.lib /out:jam.exe
+$(EXE) : $(OBJS)
+	gcc $^ -o $@
 
 # Dependencies:
 
-jamstub.obj : \
+jamstub.o : \
 	jamstub.c \
 	jamport.h \
-	jamexprt.h
+	jamexprt.h \
+	jamgpio.c \
+	jamgpio.h
 
-jamexec.obj : \
+jamexec.o : \
 	jamexec.c \
 	jamport.h \
 	jamexprt.h \
@@ -49,21 +50,21 @@ jamexec.obj : \
 	jamarray.h \
 	jamjtag.h
 
-jamnote.obj : \
+jamnote.o : \
 	jamnote.c \
 	jamexprt.h \
 	jamdefs.h \
 	jamexec.h \
 	jamutil.h
 
-jamcrc.obj : \
+jamcrc.o : \
 	jamcrc.c \
 	jamexprt.h \
 	jamdefs.h \
 	jamexec.h \
 	jamutil.h
 
-jamsym.obj : \
+jamsym.o : \
 	jamsym.c \
 	jamexprt.h \
 	jamdefs.h \
@@ -71,7 +72,7 @@ jamsym.obj : \
 	jamheap.h \
 	jamutil.h
 
-jamstack.obj : \
+jamstack.o : \
 	jamstack.c \
 	jamexprt.h \
 	jamdefs.h \
@@ -79,7 +80,7 @@ jamstack.obj : \
 	jamsym.h \
 	jamstack.h
 
-jamheap.obj : \
+jamheap.o : \
 	jamheap.c \
 	jamport.h \
 	jamexprt.h \
@@ -89,7 +90,7 @@ jamheap.obj : \
 	jamheap.h \
 	jamutil.h
 
-jamarray.obj : \
+jamarray.o : \
 	jamarray.c \
 	jamexprt.h \
 	jamdefs.h \
@@ -102,12 +103,12 @@ jamarray.obj : \
 	jamcomp.h \
 	jamarray.h
 
-jamcomp.obj : \
+jamcomp.o : \
 	jamcomp.c \
 	jamdefs.h \
 	jamcomp.h
 
-jamjtag.obj : \
+jamjtag.o : \
 	jamjtag.c \
 	jamexprt.h \
 	jamdefs.h \
@@ -115,11 +116,11 @@ jamjtag.obj : \
 	jamutil.h \
 	jamjtag.h
 
-jamutil.obj : \
+jamutil.o : \
 	jamutil.c \
 	jamutil.h
 
-jamexp.obj : \
+jamexp.o : \
 	jamexp.c \
 	jamexprt.h \
 	jamdefs.h \
@@ -129,3 +130,9 @@ jamexp.obj : \
 	jamarray.h \
 	jamutil.h \
 	jamytab.h
+
+clean :
+	rm -f *~
+	rm -f $(OBJS)
+	rm -f $(EXE)
+	rm -f *.gch
