@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JAMARRAY.C" />
-    <ClCompile Include="..\JAMCOMP.C" />
-    <ClCompile Include="..\JAMCRC.C" />
-    <ClCompile Include="..\JAMEXEC.C" />
-    <ClCompile Include="..\JAMEXP.C" />
-    <ClCompile Include="..\JAMHEAP.C" />
-    <ClCompile Include="..\JAMJTAG.C" />
-    <ClCompile Include="..\JAMNOTE.C" />
-    <ClCompile Include="..\JAMSTACK.C" />
-    <ClCompile Include="..\JAMSTUB.C" />
-    <ClCompile Include="..\JAMSYM.C" />
-    <ClCompile Include="..\JAMUTIL.C" />
+    <ClInclude Include="..\jamarray.h" />
+    <ClInclude Include="..\jamcomp.h" />
+    <ClInclude Include="..\jamdefs.h" />
+    <ClInclude Include="..\jamexec.h" />
+    <ClInclude Include="..\jamexp.h" />
+    <ClInclude Include="..\jamexprt.h" />
+    <ClInclude Include="..\jamheap.h" />
+    <ClInclude Include="..\jamjtag.h" />
+    <ClInclude Include="..\jamport.h" />
+    <ClInclude Include="..\jamstack.h" />
+    <ClInclude Include="..\jamsym.h" />
+    <ClInclude Include="..\jamutil.h" />
+    <ClInclude Include="..\jamytab.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\JAMARRAY.H" />
-    <ClInclude Include="..\JAMCOMP.H" />
-    <ClInclude Include="..\JAMDEFS.H" />
-    <ClInclude Include="..\JAMEXEC.H" />
-    <ClInclude Include="..\JAMEXP.H" />
-    <ClInclude Include="..\JAMEXPRT.H" />
-    <ClInclude Include="..\JAMHEAP.H" />
-    <ClInclude Include="..\JAMJTAG.H" />
-    <ClInclude Include="..\JAMPORT.H" />
-    <ClInclude Include="..\JAMSTACK.H" />
-    <ClInclude Include="..\JAMSYM.H" />
-    <ClInclude Include="..\JAMUTIL.H" />
-    <ClInclude Include="..\JAMYTAB.H" />
+    <ClCompile Include="..\jamarray.c" />
+    <ClCompile Include="..\jamcomp.c" />
+    <ClCompile Include="..\jamcrc.c" />
+    <ClCompile Include="..\jamexec.c" />
+    <ClCompile Include="..\jamexp.c" />
+    <ClCompile Include="..\jamheap.c" />
+    <ClCompile Include="..\jamjtag.c" />
+    <ClCompile Include="..\jamnote.c" />
+    <ClCompile Include="..\jamstack.c" />
+    <ClCompile Include="..\jamstub.c" />
+    <ClCompile Include="..\jamsym.c" />
+    <ClCompile Include="..\jamutil.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4868B340-A957-4F2D-A9F7-07EE710E163D}</ProjectGuid>
