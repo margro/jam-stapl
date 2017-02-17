@@ -1025,11 +1025,7 @@ int main(int argc, char **argv)
 
 	for (arg = 1; arg < argc; arg++)
 	{
-#if PORT == UNIX
 		if (argv[arg][0] == '-')
-#else
-		if ((argv[arg][0] == '-') || (argv[arg][0] == '/'))
-#endif
 		{
 			switch(toupper(argv[arg][1]))
 			{
